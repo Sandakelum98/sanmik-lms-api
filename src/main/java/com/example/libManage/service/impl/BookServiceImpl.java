@@ -183,5 +183,28 @@ public class BookServiceImpl implements BookService {
 
     }
 
+    @Override
+    public ResponseEntity searchBook(HttpServletRequest request, HttpServletResponse response, String searchText) {
+        logger.info("Received search request: {}", request.getRequestURI());
+
+        try {
+            // search for books by title or author name
+            List<BookBean> searchResults = bookRepo.searchBooksByTitleOrAuthorName(searchText);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseWrapper<>().responseOk(Constants.RESPONSE_OK, searchResults));
+
+        } catch (AccessDeniedException ade) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ResponseWrapper<>().responseFail(Constants.USER_FORBIDDEN));
+        } catch (AuthenticationException ae) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseWrapper<>().responseFail(Constants.USER_UNAUTHORIZED));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseWrapper<>().responseFail(Constants.INTERNAL_SERVER_ERROR));
+        }
+    }
+
 
 }

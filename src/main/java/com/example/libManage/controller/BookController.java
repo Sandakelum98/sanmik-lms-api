@@ -40,4 +40,10 @@ public class BookController {
                                      @PathVariable Integer bookId) {
         return bookService.deleteBook(request, response, bookId);
     }
+
+    @GetMapping("/search-book/{searchText}")
+    public ResponseEntity searchBook(HttpServletRequest request, HttpServletResponse response,
+                                     @PathVariable String searchText) {
+        return bookService.searchBook(request,response,searchText);
+    }
 }

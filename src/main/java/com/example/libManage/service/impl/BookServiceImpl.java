@@ -2,6 +2,7 @@ package com.example.libManage.service.impl;
 
 import com.example.libManage.constants.Constants;
 import com.example.libManage.dto.request.book.AddBookRequest;
+import com.example.libManage.dto.request.book.SearchBookRequest;
 import com.example.libManage.entity.author.Author;
 import com.example.libManage.entity.book.BookBean;
 import com.example.libManage.repo.book.BookRepo;
@@ -17,6 +18,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -183,13 +185,22 @@ public class BookServiceImpl implements BookService {
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @Override
-    public ResponseEntity searchBook(HttpServletRequest request, HttpServletResponse response, String searchText) {
+    public ResponseEntity searchBook(HttpServletRequest request, HttpServletResponse response, SearchBookRequest searchBook) {
         logger.info("Received search request: {}", request.getRequestURI());
 
         try {
-            // search for books by title or author name
-            List<BookBean> searchResults = bookRepo.searchBooksByTitleOrAuthorName(searchText);
+            List<BookBean> searchResults;
+
+            // check if searchText is null or empty
+            if (StringUtils.isEmpty(searchBook.getSearchText())) {
+                // if searchText is null or empty, retrieve all books
+                searchResults = bookRepo.findAll();
+            } else {
+                // search for books by title or author name
+                searchResults = bookRepo.searchBooksByTitleOrAuthorName(searchBook.getSearchText());
+            }
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseWrapper<>().responseOk(Constants.RESPONSE_OK, searchResults));

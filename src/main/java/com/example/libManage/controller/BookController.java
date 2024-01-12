@@ -1,6 +1,7 @@
 package com.example.libManage.controller;
 
 import com.example.libManage.dto.request.book.AddBookRequest;
+import com.example.libManage.dto.request.book.SearchBookRequest;
 import com.example.libManage.service.book.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class BookController {
 
     @GetMapping("/get-all-books")
     public ResponseEntity getAllBooks(HttpServletRequest request, HttpServletResponse response) {
-        return bookService.getAllBookList(request,response);
+        return bookService.getAllBookList(request, response);
     }
 
     @PostMapping("/update-book")
@@ -41,9 +42,9 @@ public class BookController {
         return bookService.deleteBook(request, response, bookId);
     }
 
-    @GetMapping("/search-book/{searchText}")
+    @PostMapping("/search-book")
     public ResponseEntity searchBook(HttpServletRequest request, HttpServletResponse response,
-                                     @PathVariable String searchText) {
-        return bookService.searchBook(request,response,searchText);
+                                     @RequestBody SearchBookRequest searchBook) {
+        return bookService.searchBook(request, response, searchBook);
     }
 }
